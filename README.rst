@@ -1,4 +1,4 @@
-Sample Module Repository
+GCP DW
 ========================
 
-This simple project is an example repo for Python projects.
+This simple project loads data into gcp from cloud storage.
