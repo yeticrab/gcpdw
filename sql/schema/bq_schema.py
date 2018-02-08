@@ -75,6 +75,9 @@ installations['schema'] = (
 installations['include'] = 0
 installations['table_name'] = 'installations'
 
+# packafe this all together
+schema = {}
+schema['organisations'] = organisations
 
 # config for the job
 config = {}
