@@ -11,7 +11,8 @@ DeviceLocations['schema'] = (
   ,bigquery.SchemaField('course', 'FLOAT')
 )
 DeviceLocations['partitioning_type'] = "DAY"
-DeviceLocations['table_name'] = "device_locations"
+DeviceLocations['table_name']        = "device_location"
+DeviceLocations['include']           = True
 
 # visits
 visits = {}
@@ -22,9 +23,10 @@ visits['schema'] = (
   ,bigquery.SchemaField('exit', 'TIMESTAMP')
 )
 visits['partitioning_type'] = "DAY"
-visits['table_name'] = 'visits'
+visits['table_name']        = 'visit'
+visits['include']           = True
 
-# visits
+# venues
 venues = {}
 venues['schema'] = (
   bigquery.SchemaField('venue_id', 'STRING')
@@ -32,7 +34,8 @@ venues['schema'] = (
   ,bigquery.SchemaField('longitude', 'FLOAT')
   ,bigquery.SchemaField('latitude', 'FLOAT')
 )
-venues['table_name'] = 'venues'
+venues['table_name'] = 'venue'
+venues['include']    = True
 
 # stepschallenge
 stepschallenge = {}
@@ -45,7 +48,8 @@ stepschallenge['schema'] = (
   ,bigquery.SchemaField('org_id', 'STRING')
 )
 stepschallenge['partitioning_type'] = "DAY"
-stepschallenge['table_name'] = 'stepschallenge'
+stepschallenge['table_name']        = 'step_challenge'
+stepschallenge['include']           = True
 
 # organisations
 organisations = {}
@@ -57,8 +61,9 @@ organisations['schema'] = (
   ,bigquery.SchemaField('timestamp', 'TIMESTAMP')
   ,bigquery.SchemaField('org_id', 'STRING')
 )
-organisations['include'] = 0
-organisations['table_name'] = 'organisations'
+
+organisations['table_name'] = 'organisation'
+organisations['include']    = False
 
 # installations
 installations = {}
@@ -72,15 +77,27 @@ installations['schema'] = (
   ,bigquery.SchemaField('username', 'STRING')
   ,bigquery.SchemaField('id', 'STRING')
 )
-installations['include'] = 0
-installations['table_name'] = 'installations'
 
-# packafe this all together
+installations['table_name'] = 'installation'
+installations['include']    = True
+
+# ActivityData
+
+activitydata = {}
+activitydata['include']    = False
+
+# package this all together
 schema = {}
-schema['organisations'] = organisations
+schema['DeviceLocations'] = DeviceLocations
+schema['visits']          = visits
+schema['venues']          = venues
+schema['stepschallenge']  = stepschallenge
+schema['organisations']   = organisations
+schema['installations']   = installations
+schema['ActivityData']    = activitydata
 
 # config for the job
 config = {}
-config['sourceFormat']   = 'CSV'
-config['fieldDelimiter'] = ','
+config['sourceFormat']      = 'CSV'
+config['fieldDelimiter']    = ','
 config['skip_leading_rows'] = 1
