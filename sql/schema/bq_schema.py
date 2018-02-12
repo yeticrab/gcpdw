@@ -76,6 +76,10 @@ installations['schema'] = (
   ,bigquery.SchemaField('join_date', 'TIMESTAMP')
   ,bigquery.SchemaField('username', 'STRING')
   ,bigquery.SchemaField('id', 'STRING')
+  ,bigquery.SchemaField('nickname', 'STRING')
+  ,bigquery.SchemaField('org_username', 'STRING')
+  ,bigquery.SchemaField('org_name', 'STRING')
+  ,bigquery.SchemaField('org_id', 'STRING')
 )
 
 installations['table_name'] = 'installation'
