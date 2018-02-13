@@ -66,6 +66,7 @@ def load_data_from_s3(client, dataset_id, blob, schema, config, overwrite = Fals
     job_config.sourceFormat      = config['sourceFormat']
     job_config.fieldDelimiter    = config['fieldDelimiter']
     job_config.skip_leading_rows = config['skip_leading_rows']
+    job_config.max_bad_records   = config['max_bad_records']
     if overwrite:
         job_config.write_disposition = 'WRITE_TRUNCATE'
     
@@ -74,8 +75,9 @@ def load_data_from_s3(client, dataset_id, blob, schema, config, overwrite = Fals
     if if_tbl_exists(client, table_ref) & (overwrite == False):
         return 1
     job       = client.load_table_from_uri(s3_location, table_ref, job_config = job_config)
-    
-    return job
+    job.result()
+    print("loaded {0} lines of data".format(job.output_rows))
+    return 1
 
 
 def overwrite_dimensional_data(client, dataset_id, table_id, bucket, schema, config):
@@ -94,9 +96,8 @@ def load_historical_data(client, dataset_id, table_id, bucket, schema, config, o
         if file != table_id:
             continue
         print("loading {0} into big query".format(blob.name))
-        load_job = load_data_from_s3(client, dataset_id, blob, schema, config, overwrite = False)
-        load_job.result()
-        print("loaded {0} lines of data".format(load_job.output_rows))
+        load_job = load_data_from_s3(client, dataset_id, blob, schema, config, overwrite)
+
 
 ########################################
 ########################################
@@ -128,13 +129,11 @@ storage_client  = storage.Client.from_service_account_json('C:/usr/yeticrab/data
 sojourn_bucket  = storage_client.bucket('sojourn')
 
 
-create_dataset(bigquery_client, 'sojourn')
-
-
 overwrite_dimensional_data(bigquery_client, 'sojourn', 'venues', sojourn_bucket, schema, config)
 overwrite_dimensional_data(bigquery_client, 'sojourn', 'installations', sojourn_bucket, schema, config)
-
 load_historical_data(bigquery_client, 'sojourn', 'stepschallenge', sojourn_bucket, schema, config)
-load_historical_data(bigquery_client, 'sojourn', 'DeviceLocations',  sojourn_bucket, schema, config)
+load_historical_data(bigquery_client, 'sojourn', 'DeviceLocations',  sojourn_bucket, schema, config, overwrite = True)
 load_historical_data(bigquery_client, 'sojourn', 'visits', sojourn_bucket, schema, config)
 
+## overwrite function
+## skip rows with errors - write to log

@@ -105,3 +105,4 @@ config = {}
 config['sourceFormat']      = 'CSV'
 config['fieldDelimiter']    = ','
 config['skip_leading_rows'] = 1
+config['max_bad_records']   = 100
