@@ -137,3 +137,23 @@ load_historical_data(bigquery_client, 'sojourn', 'visits', sojourn_bucket, schem
 
 ## overwrite function
 ## skip rows with errors - write to log
+
+
+########################################
+########################################
+########################################
+
+# list tables
+# find row count 
+# delete
+dataset_ref = bigquery_client.dataset('sojourn')
+tables = list(bigquery_client.list_dataset_tables(dataset_ref))
+
+for table in tables:
+    print(1)
+
+########################################
+########################################
+########################################
+
+2017-05-19.cs
