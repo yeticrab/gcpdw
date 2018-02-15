@@ -43,25 +43,21 @@ known_profiles = known_profiles.reset_index(drop=True)
 
 ## match to postcode and write into big query
 
-query = """
-select
-*
-from
-`external.uk_postcodes`
-"""
+from google.cloud import storage
+import pandas as pd
 
-asn_query      = bigquery_client.query(query)
-asn_it         = asn_query.result()
-postcodes      = pd.DataFrame()
-for row in asn_it:
-    record = pd.DataFrame({
-            'postcode'   : row.get('postcode')
-            ,'latitude'  : row.get('latitude')
-            ,'longitude' : row.get('longitude')
-            }, index = [0])
-    postcodes = postcodes.append(record)
+storage_bucket    = 'fidler'
+filename          = 'ukpostcodes.csv'
+cred_json         = 'C:/usr/yeticrab/datacrab-045e6e03b60b.json'
+
+storage_client  = storage.Client.from_service_account_json(cred_json)
+bucket          = storage_client.bucket(storage_bucket)
+blob            = bucket.get_blob(filename)
+
+blob.download_to_filename('c:\\usr\\test.csv')
+postcodes       = pd.read_csv('c:\\usr\\test.csv')
+postcodes.postcode = postcodes.postcode.replace(' ','', regex = True)
+known_profiles  = pd.merge(known_profiles, postcodes, 'left', on = 'postcode')
 
 
-postcodes = postcodes.reset_index(drop=True)
-
-
+known_profiles.dropna(axis=0, how='all')
