@@ -7,14 +7,15 @@ Quick hacky script to load data from storage
 @author: roger.gill
 """
 
+
 from google.cloud import storage
 from google.cloud import bigquery
 
-storage_bucket    = ''
-filename          = ''
-cred_json         = ''
-destination_table = ''
-destination_table_name = ''
+storage_bucket    = 'filder'
+filename          = 'known_profiles.csv'
+cred_json         = 'C:/usr/yeticrab/datacrab-045e6e03b60b.json'
+destination_table = 'fidler'
+destination_table_name = 'known_profiles'
 
 storage_client  = storage.Client.from_service_account_json(cred_json)
 bucket          = storage_client.bucket(storage_bucket)
@@ -25,9 +26,13 @@ s3_location     = "gs://{0}/{1}".format(blob.bucket.name, blob.name)
 bigquery_client = bigquery.Client()
 
 postcode_config = (
-  bigquery.SchemaField('field1', 'STRING')
-  ,bigquery.SchemaField('fiel2', 'FLOAT')
-  ,bigquery.SchemaField('field3', 'FLOAT')
+  bigquery.SchemaField('id', 'STRING')
+  ,bigquery.SchemaField('idfa', 'STRING')  
+  ,bigquery.SchemaField('installation_id', 'STRING')  
+  ,bigquery.SchemaField('postcode', 'STRING') 
+  ,bigquery.SchemaField('pid', 'FLOAT')  
+  ,bigquery.SchemaField('latitude', 'FLOAT')
+  ,bigquery.SchemaField('longitude', 'FLOAT')
 )
 
 job_config                   = bigquery.LoadJobConfig()

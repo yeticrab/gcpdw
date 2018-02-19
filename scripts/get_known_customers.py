@@ -10,6 +10,7 @@ Query and standardise the installations with a postcode
 import re
 import pandas as pd
 from google.cloud import bigquery
+from google.cloud import storage
 bigquery_client = bigquery.Client()
 
 query = """
@@ -58,6 +59,15 @@ blob.download_to_filename('c:\\usr\\test.csv')
 postcodes       = pd.read_csv('c:\\usr\\test.csv')
 postcodes.postcode = postcodes.postcode.replace(' ','', regex = True)
 known_profiles  = pd.merge(known_profiles, postcodes, 'left', on = 'postcode')
+known_profiles  = known_profiles[~known_profiles.latitude.isin(['NaN'])]
+known_profiles.to_csv('c:\\usr\\test.csv', in)
 
+## now we load to storage
 
-known_profiles.dropna(axis=0, how='all')
+storage_client  = storage.Client.from_service_account_json('C:/usr/yeticrab/datacrab-045e6e03b60b.json')
+bucket          = storage_client.bucket('fidler')
+blob            = bucket.blob('known_profiles.csv')
+blob.upload_from_filename('c:\\usr\\test.csv')
+
+## and into bigquery
+
