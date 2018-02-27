@@ -21,10 +21,12 @@ from
 where postcode is not null and postcode != '' and postcode != '(null)' and postcode != '(NULL)'
 """
 
-asn_query      = bigquery_client.query(query)
-asn_it         = asn_query.result()
-known_profiles = pd.DataFrame()
-for row in asn_it:
+known_profiles = pd.read_gbq(query, 'datacrab-186315', dialect = 'standard')
+known_profiles = known_profiles.reset_index(drop=True)
+
+profiles = pd.DataFrame()
+
+for index, row in known_profiles.iterrows():
     pcode = row.get('postcode')
     pcode = re.sub('[^A-Za-z0-9]+', '', pcode)
     pcode = pcode.upper()
@@ -36,10 +38,10 @@ for row in asn_it:
                 ,'postcode' : pmat[0]
                 ,'idfa' : row.get('idfa')
                 }, index = [0])
-        known_profiles = known_profiles.append(record)
+        profiles = profiles.append(record)
 
 
-known_profiles = known_profiles.reset_index(drop=True)
+profiles = profiles.reset_index(drop=True)
 
 
 ## match to postcode and write into big query
@@ -47,9 +49,9 @@ known_profiles = known_profiles.reset_index(drop=True)
 from google.cloud import storage
 import pandas as pd
 
-storage_bucket    = 'fidler'
+storage_bucket    = 'sworn'
 filename          = 'ukpostcodes.csv'
-cred_json         = 'C:/usr/yeticrab/datacrab-045e6e03b60b.json'
+cred_json         = ''
 
 storage_client  = storage.Client.from_service_account_json(cred_json)
 bucket          = storage_client.bucket(storage_bucket)
@@ -58,14 +60,14 @@ blob            = bucket.get_blob(filename)
 blob.download_to_filename('c:\\usr\\test.csv')
 postcodes       = pd.read_csv('c:\\usr\\test.csv')
 postcodes.postcode = postcodes.postcode.replace(' ','', regex = True)
-known_profiles  = pd.merge(known_profiles, postcodes, 'left', on = 'postcode')
-known_profiles  = known_profiles[~known_profiles.latitude.isin(['NaN'])]
-known_profiles.to_csv('c:\\usr\\test.csv', in)
+profiles  = pd.merge(known_profiles, postcodes, 'left', on = 'postcode')
+profiles  = profiles[~profiles.latitude.isin(['NaN'])]
+profiles.to_csv('c:\\usr\\test.csv', index = False)
 
 ## now we load to storage
 
 storage_client  = storage.Client.from_service_account_json('C:/usr/yeticrab/datacrab-045e6e03b60b.json')
-bucket          = storage_client.bucket('fidler')
+bucket          = storage_client.bucket(storage_bucket)
 blob            = bucket.blob('known_profiles.csv')
 blob.upload_from_filename('c:\\usr\\test.csv')
 

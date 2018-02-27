@@ -11,10 +11,10 @@ Quick hacky script to load data from storage
 from google.cloud import storage
 from google.cloud import bigquery
 
-storage_bucket    = 'filder'
+storage_bucket    = 'sworn'
 filename          = 'known_profiles.csv'
 cred_json         = 'C:/usr/yeticrab/datacrab-045e6e03b60b.json'
-destination_table = 'fidler'
+destination_table = 'sworn'
 destination_table_name = 'known_profiles'
 
 storage_client  = storage.Client.from_service_account_json(cred_json)
